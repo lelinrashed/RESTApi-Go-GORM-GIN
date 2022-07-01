@@ -51,15 +51,15 @@ func (c *authController) Login(ctx *gin.Context) {
 
 func (c *authController) Register(ctx *gin.Context) {
 	var registerDTO dto.RegisterDTO
-	err := ctx.ShouldBind(&registerDTO)
-	if err != nil {
-		response := helper.BuildErrorResponse("Faild to process request", err.Error(), helper.EmptyObj{})
+	errDTO := ctx.ShouldBind(&registerDTO)
+	if errDTO != nil {
+		response := helper.BuildErrorResponse("Faild to process request", errDTO.Error(), helper.EmptyObj{})
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
 	}
 
 	if !c.authService.IsDuplicateEmail(registerDTO.Email) {
-		response := helper.BuildErrorResponse("Faild to process request", err.Error(), helper.EmptyObj{})
+		response := helper.BuildErrorResponse("Faild to process request", "Duplicate Email", helper.EmptyObj{})
 		ctx.JSON(http.StatusConflict, response)
 	} else {
 		createdUser := c.authService.CreateUser(registerDTO)
